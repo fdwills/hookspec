@@ -3,7 +3,7 @@ hookspec
 
 ## Lastest version
 
-v1.0.0(beta)
+v1.1.0(beta)
 
 ## About
 
@@ -25,15 +25,37 @@ After hookspec gem is installed, you can use 'hookspec' command. Execute the com
 
 New a spec file under git\_hooks/[hook\_type]/ named like _FILENAME_\_spec.rb
 
-    # assert branch is not master branch
-    require 'hookspec'
+### Sample: Check push branch
 
-    describe "push" do
-      let (:git_env) {HookSpec::GitEnv.new}
-      it 'master branch can not be pushed' do
-        expect(git_env).not_to be_branch('master')
+```ruby
+# assert branch is not master branch
+require 'hookspec'
+
+describe "push" do
+  let (:git_env) {HookSpec::GitEnv.new}
+  it 'master branch can not be pushed' do
+    expect(git_env).not_to be_branch('master')
+  end
+end
+```
+
+### Sample: Check with rubocop
+
+`install rubocop first`
+
+```ruby
+describe "rubocop check" do
+  let (:git_env) {HookSpec::GitEnv.new}
+  it 'rubocop must pass' do
+    git_env.diff(model: 'cached', filter: 'AM').each do |f| 
+      if f.end_with?('.rb')
+        `rubocop #{f}`
+        expect($?).to be_nil
       end
     end
+  end
+end
+```
 
 ## Supported hook\_type
 
@@ -62,15 +84,17 @@ New a spec file under git\_hooks/[hook\_type]/ named like _FILENAME_\_spec.rb
 
 #### how to validate include certain file or not
 
-    it 'show not include certain files' do
-      expect(git_env.diffs_of_local[:D]).not_to include_file('README.md')
+    it 'commit not delete certain files' do
+      expect(git_env.diff(model: 'cached', filter: 'D').not_to include_file('README.md')
     end
 
-Provide three diff type of diffs:
+* use git\_env.diff(model: `model_name`, filter: `filters`)
+* filters: A|C|D|M|R|T|U|X|B
 
-* git\_env.diffs\_of\_local: unstaged files hashed by status types(A|C|D|M|R|T|U|X|B)
-* git\_env.diffs\_of\_cached: cached files hashed by status types(A|C|D|M|R|T|U|X|B)
-* git\_env.diffs\_of\_commited: last commited files hashed by status types(A|C|D|M|R|T|U|X|B)
+```ruby
+# get cached file list with filter 'AM'
+git_env.diff(model: 'cached', filter: 'AM')
+```
 
 #### how to get git configure
 

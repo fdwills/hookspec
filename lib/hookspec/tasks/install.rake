@@ -33,7 +33,7 @@ Current dirctory is not git repo root dirctory!
 
   hooks.each do |hook|
     # copy hook.sh
-    mv(".git/hooks/#{hook}", ".git/hooks/#{hook}.bk")
+    mv(".git/hooks/#{hook}", ".git/hooks/#{hook}.bk") if File.exist?(".git/hooks/#{hook}")
     sh_template = File.read (File.expand_path("../../templates/" + hook + ".sh", __FILE__) )
     File.open(".git/hooks/#{hook}", 'w+') do |f|
       f.write(ERB.new(sh_template).result(binding))

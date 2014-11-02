@@ -41,7 +41,7 @@ end
 
 ### Sample: Check with rubocop
 
-`install rubocop first`
+Include rubocop in your Gemfile
 
 ```ruby
 describe "rubocop check" do
@@ -49,7 +49,7 @@ describe "rubocop check" do
   it 'rubocop must pass' do
     git_env.diff(model: 'cached', filter: 'AM').each do |f| 
       if f.end_with?('.rb')
-        `rubocop #{f}`
+        puts `rubocop #{f}`
         expect($?).to be_nil
       end
     end
